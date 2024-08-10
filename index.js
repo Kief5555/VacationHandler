@@ -38,7 +38,7 @@ const authMiddleware = (req, res, next) => {
     const user = basicAuth(req);
     if (!user || user.pass !== process.env.PASSWORD) {
         res.set('WWW-Authenticate', 'Basic realm="example"');
-        return res.status(401).send('Authentication required.');
+        return res.status(401).json({ status: false, message: 'Invalid credentials' });
     }
     next();
 };
@@ -53,6 +53,21 @@ const getImages = (city) => {
         location: `https://${process.env.HOSTNAME}/${city}/${fileName}`
     }));
 };
+
+// GET route to list all cities
+app.get('/cities', authMiddleware, (req, res) => {
+    const cities = fs.readdirSync(IMAGES_DIR).filter((file) => fs.statSync(path.join(IMAGES_DIR, file)).isDirectory());
+    res.json({ status: true, cities });
+});
+
+// GET route to view all images
+app.get('/images', authMiddleware, (req, res) => {
+    const allImages = {};
+    fs.readdirSync(IMAGES_DIR).forEach((city) => {
+        allImages[city] = getImages(city);
+    });
+    res.json({ status: true, images: allImages });
+});
 
 // POST route to get images by city
 app.post('/:city', (req, res) => {
@@ -74,23 +89,13 @@ app.get('/:city/:image', authMiddleware, (req, res) => {
 
 // GET route to redirect to the frontend
 app.get('/:city', (req, res) => {
-    res.redirect(`https://printedwaste.com/v/${req.params.city}`);
+    res.redirect(`https://printedwaste.com/v/?city=${req.params.city}`);
 });
 
-// GET route to list all cities
-app.get('/cities', authMiddleware, (req, res) => {
-    const cities = fs.readdirSync(IMAGES_DIR).filter((file) => fs.statSync(path.join(IMAGES_DIR, file)).isDirectory());
-    res.json({ status: true, cities });
+app.get('/', (req, res) => {
+    res.redirect('https://printedwaste.com/v/');
 });
 
-// GET route to view all images
-app.get('/images', authMiddleware, (req, res) => {
-    const allImages = {};
-    fs.readdirSync(IMAGES_DIR).forEach((city) => {
-        allImages[city] = getImages(city);
-    });
-    res.json({ status: true, images: allImages });
-});
 
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
