@@ -36,6 +36,19 @@ app.use((req, res, next) => {
     next();
 });
 
+
+// GET route to return an image by name
+app.get('/:city/:image', (req, res) => {
+    const password = req.query.password;
+    if (password !== process.env.PASSWORD) return res.status(401).send({ status: false, errors: ['Access denied.'] });
+    const imagePath = path.join(IMAGES_DIR, req.params.city, req.params.image);
+    if (!fs.existsSync(imagePath)) return res.status(404).send({ status: false, errors: ['Image not found.'] });
+
+    res.setHeader('Cache-Control', 'public, max-age=86400'); // Cache for 1 day
+    res.setHeader('Content-Type', 'image/jpeg');
+    res.sendFile(imagePath);
+});
+
 // Middleware for basic auth
 const authMiddleware = (req, res, next) => {
     const user = basicAuth(req);
@@ -78,17 +91,6 @@ app.post('/:city', authMiddleware, (req, res) => {
     res.json({ status: true, images });
 });
 
-// GET route to return an image by name
-app.get('/:city/:image', (req, res) => {
-    const password = req.query.password;
-    if (password !== process.env.PASSWORD) return res.status(401).send({ status: false, errors: ['Access denied.'] });
-    const imagePath = path.join(IMAGES_DIR, req.params.city, req.params.image);
-    if (!fs.existsSync(imagePath)) return res.status(404).send({ status: false, errors: ['Image not found.'] });
-
-    res.setHeader('Cache-Control', 'public, max-age=86400'); // Cache for 1 day
-    res.setHeader('Content-Type', 'image/jpeg');
-    res.sendFile(imagePath);
-});
 
 // GET route to redirect to the frontend
 app.get('/:city', (req, res) => {
