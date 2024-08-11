@@ -80,7 +80,7 @@ app.get('/cities', authMiddleware, (req, res) => {
 });
 
 // GET route to view all images
-app.get('/images', authMiddleware, (req, res) => {
+app.post('/images', authMiddleware, (req, res) => {
     const allImages = {};
     fs.readdirSync(IMAGES_DIR).forEach((city) => {
         allImages[city] = getImages(city);
