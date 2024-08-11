@@ -53,7 +53,7 @@ const getImages = (city) => {
 
     return fs.readdirSync(cityDir).map((fileName) => ({
         name: fileName,
-        location: `https://${process.env.HOSTNAME}/${city}/${fileName}`
+        location: `https://${process.env.HOSTNAME}/${city}/${fileName}?password=${process.env.PASSWORD}`
     }));
 };
 
@@ -79,9 +79,11 @@ app.post('/:city', authMiddleware, (req, res) => {
 });
 
 // GET route to return an image by name
-app.get('/:city/:image', authMiddleware, (req, res) => {
+app.get('/:city/:image', (req, res) => {
+    const password = req.query.password;
+    if (password !== process.env.PASSWORD) return res.status(401).send({ status: false, errors: ['Access denied.'] });
     const imagePath = path.join(IMAGES_DIR, req.params.city, req.params.image);
-    if (!fs.existsSync(imagePath)) return res.status(404).send('Image not found.');
+    if (!fs.existsSync(imagePath)) return res.status(404).send({ status: false, errors: ['Image not found.'] });
 
     res.setHeader('Cache-Control', 'public, max-age=86400'); // Cache for 1 day
     res.setHeader('Content-Type', 'image/jpeg');
