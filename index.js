@@ -83,7 +83,8 @@ app.get('/cities', authMiddleware, (req, res) => {
 app.post('/images', authMiddleware, (req, res) => {
     const allImages = {};
     fs.readdirSync(IMAGES_DIR).forEach((city) => {
-        allImages[city] = getImages(city);
+        //Add the images to the allImages object without the city name in the key so we just add to the object
+        allImages = { ...allImages, ...getImages(city) };
     });
     res.json({ status: true, images: allImages });
 });
