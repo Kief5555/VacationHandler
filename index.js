@@ -84,6 +84,7 @@ app.get('/:city/:image', authMiddleware, (req, res) => {
     if (!fs.existsSync(imagePath)) return res.status(404).send('Image not found.');
 
     res.setHeader('Cache-Control', 'public, max-age=86400'); // Cache for 1 day
+    res.setHeader('Content-Type', 'image/jpeg');
     res.sendFile(imagePath);
 });
 
