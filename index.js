@@ -9,10 +9,10 @@ const sqlite3 = require('sqlite3').verbose();
 const dayjs = require('dayjs');
 
 const app = express();
-const PORT = 3000;
 const IMAGES_DIR = path.join(__dirname, 'images');
 const db = new sqlite3.Database(':memory:'); // Using in-memory SQLite for simplicity
 require('dotenv').config();
+const PORT = process.env.PORT;
 
 // Create the logs table
 db.run('CREATE TABLE logs (id INTEGER PRIMARY KEY, timestamp TEXT, ip TEXT, userAgent TEXT, method TEXT, url TEXT)');
