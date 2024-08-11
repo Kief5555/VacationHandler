@@ -73,9 +73,7 @@ app.get('/images', authMiddleware, (req, res) => {
 });
 
 // POST route to get images by city
-app.post('/:city', (req, res) => {
-    const { auth } = req.query;
-    if (auth !== 'random_key') return res.status(403).json({ status: false, message: 'Invalid auth key' });
+app.post('/:city', authMiddleware, (req, res) => {
 
     const images = getImages(req.params.city);
     res.json({ status: true, images });
