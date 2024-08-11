@@ -74,7 +74,6 @@ app.get('/images', authMiddleware, (req, res) => {
 
 // POST route to get images by city
 app.post('/:city', authMiddleware, (req, res) => {
-
     const images = getImages(req.params.city);
     res.json({ status: true, images });
 });
