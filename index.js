@@ -30,7 +30,7 @@ app.use((req, res, next) => {
         url: req.url
     };
 
-    db.run('INSERT INTO logs (timestamp, ip, userAgent, method, url) VALUES (?, ?, ?, ?, ?)', 
+    db.run('INSERT INTO logs (timestamp, ip, userAgent, method, url) VALUES (?, ?, ?, ?, ?)',
         [log.timestamp, log.ip, log.userAgent, log.method, log.url]);
 
     next();
@@ -47,7 +47,7 @@ app.get('/:city/:image', (req, res) => {
     //More cache headers for cloudflare
     res.setHeader('Cache-Control', 'public, max-age=31536000');
     res.setHeader('Expires', new Date(Date.now() + 31536000).toUTCString());
-    
+
     res.setHeader('Content-Type', 'image/jpeg');
     res.sendFile(imagePath);
 });
@@ -81,10 +81,11 @@ app.get('/cities', authMiddleware, (req, res) => {
 
 // GET route to view all images
 app.post('/images', authMiddleware, (req, res) => {
-    let allImages = {};
+    let allImages = [];
+
     fs.readdirSync(IMAGES_DIR).forEach((city) => {
-        //Add the images to the allImages object without the city name in the key so we just add to the object
-        allImages = { ...allImages, ...getImages(city) };
+        const images = getImages(city);
+        allImages = allImages.concat(images);
     });
     res.json({ status: true, images: allImages });
 });
