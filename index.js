@@ -7,6 +7,8 @@ const path = require('path');
 const basicAuth = require('basic-auth');
 const sqlite3 = require('sqlite3').verbose();
 const dayjs = require('dayjs');
+const cors = require('cors');
+
 
 const app = express();
 const IMAGES_DIR = path.join(__dirname, 'images');
@@ -18,6 +20,7 @@ const PORT = process.env.PORT;
 db.run('CREATE TABLE logs (id INTEGER PRIMARY KEY, timestamp TEXT, ip TEXT, userAgent TEXT, method TEXT, url TEXT)');
 
 // Middleware to log requests
+app.use(cors({ credentials: true, origin: true }));
 app.use((req, res, next) => {
     const log = {
         timestamp: dayjs().toISOString(),
