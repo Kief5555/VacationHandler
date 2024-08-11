@@ -41,7 +41,7 @@ const authMiddleware = (req, res, next) => {
     const user = basicAuth(req);
     if (!user || user.pass !== process.env.PASSWORD) {
         res.set('WWW-Authenticate', 'Basic realm="example"');
-        return res.status(401).json({ status: false, message: 'Invalid credentials' });
+        return res.status(401).json({ status: false, errors: ['Invalid credentials'] });
     }
     next();
 };
