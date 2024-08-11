@@ -44,7 +44,10 @@ app.get('/:city/:image', (req, res) => {
     const imagePath = path.join(IMAGES_DIR, req.params.city, req.params.image);
     if (!fs.existsSync(imagePath)) return res.status(404).send({ status: false, errors: ['Image not found.'] });
 
-    res.setHeader('Cache-Control', 'public, max-age=86400'); // Cache for 1 day
+    //More cache headers for cloudflare
+    res.setHeader('Cache-Control', 'public, max-age=31536000');
+    res.setHeader('Expires', new Date(Date.now() + 31536000).toUTCString());
+    
     res.setHeader('Content-Type', 'image/jpeg');
     res.sendFile(imagePath);
 });
