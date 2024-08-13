@@ -87,6 +87,13 @@ app.post('/images', authMiddleware, (req, res) => {
         const images = getImages(city);
         allImages = allImages.concat(images);
     });
+
+    //Drop duplicate images, if any (allow the first one to stay)
+    allImages = allImages.filter((image, index, self) =>
+        index === self.findIndex((t) => (
+            t.name === image.name
+        ))
+    );
     res.json({ status: true, images: allImages });
 });
 
